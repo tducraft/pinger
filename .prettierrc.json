@@ -1,0 +1,10 @@
+{
+  "printWidth": 80,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "useTabs": false,
+  "semi": false,
+  "singleQuote": true,
+  "endOfLine": "lf",
+  "organizeImportsSkipDestructiveCodeActions": true
+}
