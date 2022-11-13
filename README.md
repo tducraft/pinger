@@ -12,7 +12,7 @@ docker run --rm -it -v "$PWD":/home/node/app -w /home/node/app -u 1000:1000 node
 
 ## Update on EC2
 
-```
+```sh
 cd ~/pinger
 pm2 stop pinger
 git pull
