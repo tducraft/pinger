@@ -4,11 +4,14 @@ import {
   PutMetricDataCommand,
 } from '@aws-sdk/client-cloudwatch'
 
+const StatusCheckFailed = 'StatusCheckFailed'
+const Players = 'Players'
+
 export type PutMetricDataInput = {
   region: string
-  metricName: string
   time: Date
-  value: number
+  failed: number
+  playersCount: number
   namespace: string
   dimensionServerName: null | string
   dimensionTarget: string
@@ -17,39 +20,67 @@ export type PutMetricDataInput = {
 export const putMeticData = async (props: PutMetricDataInput) => {
   const {
     region,
-    metricName,
     time,
-    value,
+    failed,
+    playersCount,
     namespace,
     dimensionServerName,
     dimensionTarget,
   } = props
   const client = new CloudWatchClient({ region: region })
 
-  const datum: MetricDatum[] = [
-    {
-      MetricName: metricName,
-      Timestamp: time,
-      Value: value,
-      Dimensions: [{ Name: 'Target', Value: dimensionTarget }],
-    },
-  ]
+  const datum: MetricDatum[] = []
+
+  // StatusCheckFailed
+  datum.push({
+    MetricName: StatusCheckFailed,
+    Timestamp: time,
+    Value: failed,
+    Dimensions: [{ Name: 'Target', Value: dimensionTarget }],
+  })
   if (dimensionServerName) {
     datum.push({
-      MetricName: metricName,
+      MetricName: StatusCheckFailed,
       Timestamp: time,
-      Value: value,
+      Value: failed,
       Dimensions: [{ Name: 'ServerName', Value: dimensionServerName }],
     })
     datum.push({
-      MetricName: metricName,
+      MetricName: StatusCheckFailed,
       Timestamp: time,
-      Value: value,
+      Value: failed,
       Dimensions: [
         { Name: 'Target', Value: dimensionTarget },
         { Name: 'ServerName', Value: dimensionServerName },
       ],
     })
+  }
+
+  // Players
+  if (playersCount !== -1) {
+    datum.push({
+      MetricName: Players,
+      Timestamp: time,
+      Value: playersCount,
+      Dimensions: [{ Name: 'Target', Value: dimensionTarget }],
+    })
+    if (dimensionServerName) {
+      datum.push({
+        MetricName: Players,
+        Timestamp: time,
+        Value: playersCount,
+        Dimensions: [{ Name: 'ServerName', Value: dimensionServerName }],
+      })
+      datum.push({
+        MetricName: Players,
+        Timestamp: time,
+        Value: playersCount,
+        Dimensions: [
+          { Name: 'Target', Value: dimensionTarget },
+          { Name: 'ServerName', Value: dimensionServerName },
+        ],
+      })
+    }
   }
 
   const command = new PutMetricDataCommand({

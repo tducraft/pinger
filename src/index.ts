@@ -5,7 +5,6 @@ import {
   AWSRegion,
   cronSchedule,
   cwLogGroupName,
-  cwMetricName,
   cwNamespace,
   cwServerName,
   domain,
@@ -38,7 +37,6 @@ const createLogEvent = (props: LogFormat): InputLogEvent => {
 console.log('Config', {
   AWSRegion,
   cronSchedule,
-  cwMetricName,
   cwNamespace,
   cwServerName,
   domain,
@@ -63,17 +61,18 @@ const onTick = async () => {
     const time = new Date()
     const result = await pinger({ domain, port, timeout })
     // console.log(JSON.stringify(result, null, 2))
+    const players = result.body?.players.online ?? -1
     const response = await putMeticData({
       region: AWSRegion,
-      metricName: cwMetricName,
       time: time,
-      value: result.isSuccess ? 0 : 1,
+      failed: result.isSuccess ? 0 : 1,
+      playersCount: players,
       namespace: cwNamespace,
       dimensionServerName: cwServerName,
       dimensionTarget: target,
     })
     const success = result.isSuccess ? 'Success' : 'Failed'
-    const _log = `[JOB] Time=${time.toISOString()}, Target=${target}, Status=${success}`
+    const _log = `[JOB] Time=${time.toISOString()}, Target=${target}, Players=${players}, Status=${success}`
     console.log(_log)
     const message = result.isSuccess
       ? 'OK'

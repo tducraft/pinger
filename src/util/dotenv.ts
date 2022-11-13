@@ -26,9 +26,6 @@ export const cwNamespace = process.env.CLOUDWATCH_NAMESPACE || ''
 if (!cwNamespace)
   throw new Error('Missing environment variable CLOUDWATCH_NAMESPACE.')
 
-export const cwMetricName =
-  process.env.CLOUDWATCH_METRIC_NAME || 'StatusCheckFailed'
-
 export const cwServerName = process.env.CLOUDWATCH_SERVER_NAME || null
 
 export const cwLogGroupName = process.env.CLOUDWATCH_LOG_GROUP_NAME || null
